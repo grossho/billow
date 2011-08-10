@@ -32,6 +32,6 @@ extern PyObject* billow_expectone(PyObject* self, PyObject* arg);
 extern PyObject* billow_coalesce(PyObject* self, PyObject* arg);
 extern PyObject* billow_minowe(PyObject* self, PyObject* arg);
 extern PyObject* billow_maxowe(PyObject* self, PyObject* arg);
-extern PyObject* billow_edgeowe(PyObject* self, PyObject* arg);
+extern PyObject* billow_rangowe(PyObject* self, PyObject* arg);
 
 #endif /* HEADER_BILLOW_NIL */

@@ -315,7 +315,7 @@ billow_minowe(PyObject* self, PyObject* arg) {
 }
 
 PyObject*
-billow_edgeowe(PyObject* self, PyObject* arg) {
+billow_rangowe(PyObject* self, PyObject* arg) {
 	PyObject* min = NULL;
 	PyObject* max = NULL;
 	PyObject* first = NULL;

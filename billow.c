@@ -66,12 +66,12 @@ register_into_builtin(void) {
 static PyMethodDef module_Methods[] = {
 { "maxowe_it", (PyCFunction)billow_maxowe, METH_O, NULL },
 { "minowe_it", (PyCFunction)billow_minowe, METH_O, NULL },
-{ "edgeowe_it", (PyCFunction)billow_edgeowe, METH_O, NULL },
+{ "rangowe_it", (PyCFunction)billow_rangowe, METH_O, NULL },
 { "expectone_it", (PyCFunction)billow_expectone, METH_O, NULL },
 { "coalesce_it", (PyCFunction)billow_coalesce, METH_O, NULL },
 { "maxowe", (PyCFunction)billow_maxowe, METH_VARARGS, NULL },
 { "minowe", (PyCFunction)billow_minowe, METH_VARARGS, NULL },
-{ "edgeowe", (PyCFunction)billow_edgeowe, METH_VARARGS, NULL },
+{ "rangowe", (PyCFunction)billow_rangowe, METH_VARARGS, NULL },
 { "expectone", (PyCFunction)billow_expectone, METH_VARARGS, NULL },
 { "coalesce", (PyCFunction)billow_coalesce, METH_VARARGS, NULL },
 { NULL, NULL, 0, NULL }
