@@ -355,7 +355,8 @@ bw_treedict__fromkeys(PyTypeObject* tp, PyObject* args, PyObject* kwargs) {
 		if ((n = (bw_treedict_node_t*)**k) == NULL) {
 			if ((n = PyMem_MALLOC(sizeof(*n))) == NULL)
 				goto failed;
-			n->n_link.link[0] = n->n_link.link[1] = NULL;
+			//n->n_link.link[0] = n->n_link.link[1] = NULL;
+			//algo->algo_setstate(algo, n, 0);
 			// borrowed refcount
 			n->n_key = next;
 			next = NULL;
@@ -592,7 +593,8 @@ bw_treedict__setdefault(bw_treedict_t* td, PyObject* args) {
 			PyErr_NoMemory();
 			goto failed;
 		}
-		n->n_link.link[0] = n->n_link.link[1] = NULL;
+		//n->n_link.link[0] = n->n_link.link[1] = NULL;
+		//algo->algo_setstate(algo, n, 0);
 		Py_INCREF(key);
 		n->n_key = key;
 		Py_INCREF(value);
@@ -761,7 +763,8 @@ bw_treedict__pushmin(bw_treedict_t* td, PyObject* args) {
 		PyErr_NoMemory();
 		goto failed;
 	}
-	n->n_link.link[0] = n->n_link.link[1] = NULL;
+	//n->n_link.link[0] = n->n_link.link[1] = NULL;
+	//algo->algo_setstate(algo, n, 0);
 	Py_INCREF(key);
 	n->n_key = key;
 	Py_INCREF(value);
@@ -794,7 +797,8 @@ bw_treedict__pushmax(bw_treedict_t* td, PyObject* args) {
 		PyErr_NoMemory();
 		goto failed;
 	}
-	n->n_link.link[0] = n->n_link.link[1] = NULL;
+	//n->n_link.link[0] = n->n_link.link[1] = NULL;
+	//algo->algo_setstate(algo, n, 0);
 	Py_INCREF(key);
 	n->n_key = key;
 	Py_INCREF(value);
@@ -981,6 +985,7 @@ bw_treedict__copy_inc(bw_treedict_t* td) {
 			goto failed;
 		}
 		n2->n_link.link[0] = n2->n_link.link[1] = NULL;
+		algo->algo_setstate(algo, &n2->n_link, algo->algo_getstate(algo, &n->n_link));
 		Py_INCREF(n->n_key);
 		n2->n_key = n->n_key;
 		Py_INCREF(n->n_value);
@@ -1026,6 +1031,7 @@ bw_treedict__copy_dec(bw_treedict_t* td) {
 			goto failed;
 		}
 		n2->n_link.link[0] = n2->n_link.link[1] = NULL;
+		algo->algo_setstate(algo, &n2->n_link, algo->algo_getstate(algo, &n->n_link));
 		Py_INCREF(n->n_key);
 		n2->n_key = n->n_key;
 		Py_INCREF(n->n_value);
@@ -1067,6 +1073,7 @@ bw_treedict__xcopy_inc(bw_treedict_t* td) {
 		goto failed;
 	}
 	n2->n_link.link[0] = n2->n_link.link[1] = NULL;
+	algo->algo_setstate(algo, &n2->n_link, algo->algo_getstate(algo, &n->n_link));
 	Py_INCREF(n->n_key);
 	n2->n_key = n->n_key;
 	Py_INCREF(n->n_value);
@@ -1094,6 +1101,7 @@ bw_treedict__xcopy_inc(bw_treedict_t* td) {
 			goto failed;
 		}
 		n2->n_link.link[0] = n2->n_link.link[1] = NULL;
+		algo->algo_setstate(algo, &n2->n_link, algo->algo_getstate(algo, &n->n_link));
 		Py_INCREF(n->n_key);
 		n2->n_key = n->n_key;
 		Py_INCREF(n->n_value);
@@ -1137,6 +1145,7 @@ bw_treedict__xcopy_dec(bw_treedict_t* td) {
 		goto failed;
 	}
 	n2->n_link.link[0] = n2->n_link.link[1] = NULL;
+	algo->algo_setstate(algo, &n2->n_link, algo->algo_getstate(algo, &n->n_link));
 	Py_INCREF(n->n_key);
 	n2->n_key = n->n_key;
 	Py_INCREF(n->n_value);
@@ -1164,6 +1173,7 @@ bw_treedict__xcopy_dec(bw_treedict_t* td) {
 			goto failed;
 		}
 		n2->n_link.link[0] = n2->n_link.link[1] = NULL;
+		algo->algo_setstate(algo, &n2->n_link, algo->algo_getstate(algo, &n->n_link));
 		Py_INCREF(n->n_key);
 		n2->n_key = n->n_key;
 		Py_INCREF(n->n_value);
@@ -1300,7 +1310,8 @@ bw_treedict__update(bw_treedict_t* td, PyObject* arg) {
 					PyErr_NoMemory();
 					goto failed;
 				}
-				n->n_link.link[0] = n->n_link.link[1] = NULL;
+				//n->n_link.link[0] = n->n_link.link[1] = NULL;
+				//algo->algo_setstate(algo, n, 0);
 				Py_INCREF(key);
 				n->n_key = key;
 				Py_INCREF(value);
@@ -1354,7 +1365,8 @@ bw_treedict__update(bw_treedict_t* td, PyObject* arg) {
 				PyErr_NoMemory();
 				goto failed2;
 			}
-			n->n_link.link[0] = n->n_link.link[1] = NULL;
+			//n->n_link.link[0] = n->n_link.link[1] = NULL;
+			//algo->algo_setstate(algo, n, 0);
 			// borrowed refcount
 			n->n_key = key;
 			// borrowed refcount
@@ -1451,7 +1463,8 @@ bw_treedict__mp_ass_subscript(bw_treedict_t* td, PyObject* key, PyObject* value)
 			PyErr_NoMemory();
 			goto failed;
 		}
-		n->n_link.link[0] = n->n_link.link[1] = NULL;
+		//n->n_link.link[0] = n->n_link.link[1] = NULL;
+		//algo->algo_setstate(algo, n, 0);
 		Py_INCREF(key);
 		n->n_key = key;
 		Py_INCREF(value);
@@ -1654,29 +1667,17 @@ bw_treedict_Type = {
 	PyVarObject_HEAD_INIT(&PyType_Type, 0)
 	.tp_name = "billow.treedict",
 	.tp_basicsize = sizeof(bw_treedict_t),
-	.tp_itemsize = 0,
 	.tp_dealloc = (destructor)bw_treedict__tp_dealloc,
-	.tp_getattr = NULL,
-	.tp_setattr = NULL,
 	.tp_repr = (reprfunc)bw_treedict__tp_repr,
-	.tp_as_number = NULL,
 	.tp_as_sequence = (PySequenceMethods*)&bw_treedict__tp_as_sequence,
 	.tp_as_mapping = (PyMappingMethods*)&bw_treedict__tp_as_mapping,
-	.tp_hash = NULL,
-	.tp_call = NULL,
-	.tp_str = NULL,
 	.tp_getattro = (getattrofunc)PyObject_GenericGetAttr,
-	.tp_setattro = NULL,
-	.tp_as_buffer = NULL,
 	.tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_HAVE_GC,
 	//.tp_doc = bw_treedict__doc,
 	.tp_traverse = (traverseproc)bw_treedict__tp_traverse,
 	.tp_clear = (inquiry)bw_treedict__tp_clear,
-	.tp_richcompare = NULL,
 	.tp_weaklistoffset = 0,
-	//.tp_iter = (getiterfunc)bw_treedict_keys_inc,
 	.tp_methods = (struct PyMethodDef*)bw_treedict__tp_methods,
-	//.tp_getset = (struct PyGetSetDef*)bw_treedict__getset,
 	.tp_new = (newfunc)bw_treedict__tp_new,
 };
 
@@ -2260,6 +2261,33 @@ bw_cmp_buffer(PyObject* self, PyObject* args) {
 }
 
 #if PY_VERSION_HEX >= 0x03000000
+PyObject*
+bw_cmp_unicode(PyObject* self, PyObject* args) {
+	PyObject* left;
+	PyObject* right;
+	const char* left_str;
+	const char* right_str;
+	Py_ssize_t left_size;
+	Py_ssize_t right_size;
+	Py_ssize_t minsize;
+	long cmp;
+
+	if (!PyArg_UnpackTuple(args, "cmp_unicode", 2, 2, &left, &right))
+		return NULL;
+        if ((left_str = PyUnicode_AsUTF8AndSize(left, &left_size)) == NULL
+         || (right_str = PyUnicode_AsUTF8AndSize(right, &right_size)) == NULL) {
+		Py_INCREF(Py_NotImplemented);
+		return Py_NotImplemented;
+	}
+	minsize = (left_size < right_size) ? left_size : right_size;
+	if ((cmp = memcmp(left_str, right_str, minsize)) == 0) {
+		if (left_size != right_size)
+			left_size < right_size ? --cmp : ++cmp;
+	} else
+		cmp = cmp < 0 ? -1 : +1;
+	return PyInt_FromLong(cmp);
+}
+
 PyObject*
 bw_cmp_long(PyObject* self, PyObject* args) {
 	PyLongObject* left;

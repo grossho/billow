@@ -53,6 +53,7 @@ typedef struct __bw_treedict_iter_t {
 
 extern PyObject* bw_cmp_buffer(PyObject* self, PyObject* args);
 #if PY_VERSION_HEX >= 0x03000000
+extern PyObject* bw_cmp_unicode(PyObject* self, PyObject* args);
 extern PyObject* bw_cmp_long(PyObject* self, PyObject* args);
 #endif /* PY_VERSION_HEX >= 0x03000000 */
 

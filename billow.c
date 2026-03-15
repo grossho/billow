@@ -50,18 +50,6 @@ struct ritm_struct {
 	PyObject* ritm_object;
 };
 
-#if PY_VERSION_HEX < 0x03000000
-void
-bw_tick_yield(void) {
-	PyThreadState *tstate;
-
-	_Py_Ticker = _Py_CheckInterval;
-
-	tstate = PyEval_SaveThread();
-	PyEval_RestoreThread(tstate);
-}
-#endif /* PY_VERSION_HEX < 0x03000000 */
-
 struct ritm_struct ritm_global[] = {
 { RITM_NIL, 0, "Nil", (PyObject*)&bw_NilStruct },
 { RITM_NIL, RITM_FL_ISTYPE, NULL, (PyObject*)&bw_nil_Type },
@@ -171,6 +159,7 @@ static PyMethodDef billow_methods[] = {
 // from: bw_treedict.c
 { "cmp_buffer", (PyCFunction)bw_cmp_buffer, METH_VARARGS, NULL },
 #if PY_VERSION_HEX >= 0x03000000
+{ "cmp_unicode", (PyCFunction)bw_cmp_unicode, METH_VARARGS, NULL },
 { "cmp_long", (PyCFunction)bw_cmp_long, METH_VARARGS, NULL },
 #endif /* PY_VERSION_HEX >= 0x03000000 */
 

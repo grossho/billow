@@ -28,15 +28,4 @@ extern PyObject* BwExc_LimitReachedError;
 extern PyObject* BwExc_ExpectOneError;
 extern PyObject* BwExc_ConsistentError;
 
-#if PY_VERSION_HEX < 0x03000000
-
-extern void bw_tick_yield(void);
-#define BW_YIELD() if (--_Py_Ticker < 0) bw_tick_yield();
-
-#else /* PY_VERSION_HEX < 0x03000000 */
-
-#define BW_YIELD()
-
-#endif /* PY_VERSION_HEX < 0x03000000 */
-
 #endif /* HEADER_BILLOW */

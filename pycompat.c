@@ -5,6 +5,18 @@
 
 #include <Python.h>
 
+#if PY_VERSION_HEX < 0x03000000
+void
+bw_tick_yield(void) {
+	PyThreadState *tstate;
+
+	_Py_Ticker = _Py_CheckInterval;
+
+	tstate = PyEval_SaveThread();
+	PyEval_RestoreThread(tstate);
+}
+#endif /* PY_VERSION_HEX < 0x03000000 */
+
 #if PY_VERSION_HEX >= 0x03000000
 int
 PyObject_Compare(PyObject* v, PyObject* w) {

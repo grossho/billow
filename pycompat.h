@@ -87,6 +87,7 @@ typedef int(*ssizessizeobjargproc)(PyObject *, Py_ssize_t, Py_ssize_t, PyObject 
 
 #define PyString_AS_STRING PyUnicode_AS_UNICODE
 #define PyString_Check PyUnicode_Check
+#define PyString_CheckExact PyUnicode_CheckExact
 #define PyString_FromFormat PyUnicode_FromFormat
 #define PyString_FromString PyUnicode_FromString
 #define PyString_FromStringAndSize PyUnicode_FromStringAndSize
@@ -119,11 +120,15 @@ extern int PyObject_Compare(PyObject* v, PyObject* w);
 #define Py_TYPE(ob)             (((PyObject*)(ob))->ob_type)
 #endif /* !defined(Py_TYPE) */
 
-#if PY_VERSION_HEX >= 0x03080000 
-//#define PyObject_GC_TRACK	PyObject_GC_Track
-//#define _PyObject_GC_UNTRACK	PyObject_GC_UnTrack
-//#define Py_TRASHCAN_SAFE_BEGIN(x) ;
-//#define Py_TRASHCAN_SAFE_END(x) ;
-#endif /* PY_VERSION_HEX >= 0x03080000 */
+#if PY_VERSION_HEX < 0x03000000
+
+extern void bw_tick_yield(void);
+#define BW_YIELD() if (--_Py_Ticker < 0) bw_tick_yield();
+
+#else /* PY_VERSION_HEX < 0x03000000 */
+
+#define BW_YIELD()
+
+#endif /* PY_VERSION_HEX < 0x03000000 */
 
 #endif /* HEADER_PYCOMPAT */
