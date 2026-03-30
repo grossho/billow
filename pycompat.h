@@ -114,7 +114,7 @@ extern int PyObject_Compare(PyObject* v, PyObject* w);
 #define PyUnicodeWriter_WriteStr _PyUnicodeWriter_WriteStr
 #define PyUnicodeWriter_Finish _PyUnicodeWriter_Finish
 #define PyUnicodeWriter_Discard _PyUnicodeWriter_Dealloc
-#endif /*  PY_VERSION_HEX >= 0x03030000 && PY_VERSION_HEX < 0x030e0000 */
+#endif /* PY_VERSION_HEX >= 0x03030000 && PY_VERSION_HEX < 0x030e0000 */
 
 #if !defined(Py_TYPE)
 #define Py_TYPE(ob)             (((PyObject*)(ob))->ob_type)

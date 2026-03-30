@@ -613,6 +613,31 @@ failed:
 
 static
 PyObject*
+bw_treedict__replace(bw_treedict_t* td, PyObject* args) {
+	PyObject* ret = NULL;
+	PyObject* key;
+	PyObject* value;
+	bw_treedict_node_t* n;
+
+	if (!PyArg_UnpackTuple(args, "replace", 2, 2, &key, &value))
+		return NULL;
+	bw_treedict__wrlock_SET(td, NULL);
+	if ((n = bw_treedict__getbykey(td, key)) == NULL) {
+		PyErr_SetString(PyExc_KeyError, "key not found");
+		goto failed;
+	}
+	Py_INCREF(value);
+	Py_DECREF(n->n_value);
+	n->n_value = value;
+	ret = Py_None;
+	Py_INCREF(ret);
+failed:
+	bw_treedict__wrlock_UNSET(td);
+	return ret;
+}
+
+static
+PyObject*
 bw_treedict__pop(bw_treedict_t* td, PyObject* args) {
 	PyObject* ret = Py_None;
 	pxgtc_algo_t* algo = td->td_algo;
@@ -631,6 +656,7 @@ bw_treedict__pop(bw_treedict_t* td, PyObject* args) {
 		Py_INCREF(ret);
 		goto failed;
 	}
+	Py_DECREF(n->n_key);
 	// borrowed refcount
 	ret = n->n_value;
 	td->td_length--;
@@ -1061,9 +1087,9 @@ bw_treedict__xcopy_inc(bw_treedict_t* td) {
 		goto failed;
 	bw_treedict__default(td2);
 	Py_XINCREF(td->td_compare);
+	td2->td_compare = td->td_compare;
 	td2->td_length = td->td_length;
 	td2->td_lockcount = 0;
-	td2->td_compare = td->td_compare;
 	td2->td_algo = algo;
 	if ((n = (bw_treedict_node_t*)td->td_root) == NULL)
 		goto ok;
@@ -1133,9 +1159,9 @@ bw_treedict__xcopy_dec(bw_treedict_t* td) {
 		goto failed;
 	bw_treedict__default(td2);
 	Py_XINCREF(td->td_compare);
+	td2->td_compare = td->td_compare;
 	td2->td_length = td->td_length;
 	td2->td_lockcount = 0;
-	td2->td_compare = td->td_compare;
 	td2->td_algo = algo;
 	if ((n = (bw_treedict_node_t*)td->td_root) == NULL)
 		goto ok;
@@ -1455,23 +1481,36 @@ bw_treedict__mp_ass_subscript(bw_treedict_t* td, PyObject* key, PyObject* value)
 	if ((k = bw_treedict__getbypath(td, td->td_path, key)) == NULL)
 		goto failed;
 	if ((n = (bw_treedict_node_t*)**k) != NULL) {
-		Py_INCREF(value);
-		Py_DECREF(n->n_value);
-		n->n_value = value;
-	} else {
-		if ((n = PyMem_MALLOC(sizeof(*n))) == NULL) {
-			PyErr_NoMemory();
-			goto failed;
+		if (value == NULL) {
+			Py_DECREF(n->n_key);
+			Py_DECREF(n->n_value);
+			td->td_length--;
+			algo->algo_balance_remove(algo, td->td_path, k);
+			PyMem_FREE(n);
+		} else {
+			Py_INCREF(value);
+			Py_DECREF(n->n_value);
+			n->n_value = value;
 		}
-		//n->n_link.link[0] = n->n_link.link[1] = NULL;
-		//algo->algo_setstate(algo, n, 0);
-		Py_INCREF(key);
-		n->n_key = key;
-		Py_INCREF(value);
-		n->n_value = value;
-		**k = &n->n_link;
-		td->td_length++;
-		algo->algo_balance_insert(algo, td->td_path, k);
+	} else {
+		if (value == NULL) {
+			PyErr_SetObject(PyExc_KeyError, key);
+			goto failed;
+		} else {
+			if ((n = PyMem_MALLOC(sizeof(*n))) == NULL) {
+				PyErr_NoMemory();
+				goto failed;
+			}
+			//n->n_link.link[0] = n->n_link.link[1] = NULL;
+			//algo->algo_setstate(algo, n, 0);
+			Py_INCREF(key);
+			n->n_key = key;
+			Py_INCREF(value);
+			n->n_value = value;
+			**k = &n->n_link;
+			td->td_length++;
+			algo->algo_balance_insert(algo, td->td_path, k);
+		}
 	}
 	ret = 0;
 failed:
@@ -1509,6 +1548,8 @@ static PyMethodDef bw_treedict__tp_methods[] = {
 	""/*doc_bw_treedict__get*/},
 { "setdefault", (PyCFunction)bw_treedict__setdefault, METH_VARARGS,
 	""/*doc_bw_treedict__setdefault*/},
+{ "replace", (PyCFunction)bw_treedict__replace, METH_VARARGS,
+	""/*doc_bw_treedict__replace*/},
 { "pop", (PyCFunction)bw_treedict__pop, METH_VARARGS,
 	""/*doc_bw_treedict__pop*/},
 { "popmin", (PyCFunction)bw_treedict__popmin, METH_NOARGS,

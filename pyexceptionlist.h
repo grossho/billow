@@ -9,10 +9,10 @@
 #include <Python.h>
 
 struct exceptionlist {
-	char* exc_name;
+	const char* exc_name;
 	PyObject** exc_this;
 	PyObject** exc_base;
-	char* exc_doc;
+	const char* exc_doc;
 };
 
 extern int exceptions_into_module(PyObject* module, struct exceptionlist* exclist, const char* modulename);
