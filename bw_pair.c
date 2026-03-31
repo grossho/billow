@@ -518,6 +518,7 @@ bw_pair_iter__tp_traverse(bw_pair_t* pair, visitproc visit, void* arg) {
 static
 PyObject*
 bw_pair_iter__tp_iternext(bw_pair_t* pair) {
+	// borrowed refcount
 	PyObject* ret = pair->pair_o[0];
 	pair->pair_o[0] = pair->pair_o[1];
 	pair->pair_o[1] = NULL;
