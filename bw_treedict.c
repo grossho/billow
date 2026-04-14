@@ -623,7 +623,7 @@ bw_treedict__replace(bw_treedict_t* td, PyObject* args) {
 		return NULL;
 	bw_treedict__wrlock_SET(td, NULL);
 	if ((n = bw_treedict__getbykey(td, key)) == NULL) {
-		PyErr_SetString(PyExc_KeyError, "key not found");
+		PyErr_SetObject(PyExc_KeyError, key);
 		goto failed;
 	}
 	Py_INCREF(value);
@@ -638,10 +638,47 @@ failed:
 
 static
 PyObject*
+bw_treedict__insert(bw_treedict_t* td, PyObject* args) {
+	PyObject* ret = NULL;
+	PyObject* key;
+	PyObject* value;
+	pxgtc_algo_t* algo = td->td_algo;
+	px_genlink_t*** k;
+	bw_treedict_node_t* n;
+
+	if (!PyArg_UnpackTuple(args, "insert", 2, 2, &key, &value))
+		return NULL;
+	bw_treedict__wrlock_SET(td, NULL);
+	if ((k = bw_treedict__getbypath(td, td->td_path, key)) == NULL)
+		goto failed;
+	if (**k != NULL) {
+		PyErr_SetObject(PyExc_KeyError, key);
+		goto failed;
+	}
+	if ((n = PyMem_MALLOC(sizeof(*n))) == NULL) {
+		PyErr_NoMemory();
+		goto failed;
+	}
+	Py_INCREF(key);
+	n->n_key = key;
+	Py_INCREF(value);
+	n->n_value = value;
+	**k = &n->n_link;
+	td->td_length++;
+	algo->algo_balance_insert(algo, td->td_path, k);
+	ret = Py_None;
+	Py_INCREF(ret);
+failed:
+	bw_treedict__wrlock_UNSET(td);
+	return ret;
+}
+
+static
+PyObject*
 bw_treedict__pop(bw_treedict_t* td, PyObject* args) {
 	PyObject* ret = Py_None;
-	pxgtc_algo_t* algo = td->td_algo;
 	PyObject* key;
+	pxgtc_algo_t* algo = td->td_algo;
 	px_genlink_t*** k;
 	bw_treedict_node_t* n;
 
@@ -722,8 +759,8 @@ failed:
 static
 PyObject*
 bw_treedict__poppairmin(bw_treedict_t* td) {
-	pxgtc_algo_t* algo = td->td_algo;
 	PyObject* ret = NULL;
+	pxgtc_algo_t* algo = td->td_algo;
 	px_genlink_t*** k;
 	bw_treedict_node_t* n;
 
@@ -748,8 +785,8 @@ failed:
 static
 PyObject*
 bw_treedict__poppairmax(bw_treedict_t* td) {
-	pxgtc_algo_t* algo = td->td_algo;
 	PyObject* ret = NULL;
+	pxgtc_algo_t* algo = td->td_algo;
 	px_genlink_t*** k;
 	bw_treedict_node_t* n;
 
@@ -1400,7 +1437,6 @@ bw_treedict__update(bw_treedict_t* td, PyObject* arg) {
 			**k = &n->n_link;
 			td->td_length++;
 			algo->algo_balance_insert(algo, path, k);
-
 		} else {
 			Py_DECREF(key);
 			Py_DECREF(n->n_value);
@@ -1550,6 +1586,8 @@ static PyMethodDef bw_treedict__tp_methods[] = {
 	""/*doc_bw_treedict__setdefault*/},
 { "replace", (PyCFunction)bw_treedict__replace, METH_VARARGS,
 	""/*doc_bw_treedict__replace*/},
+{ "insert", (PyCFunction)bw_treedict__insert, METH_VARARGS,
+	""/*doc_bw_treedict__insert*/},
 { "pop", (PyCFunction)bw_treedict__pop, METH_VARARGS,
 	""/*doc_bw_treedict__pop*/},
 { "popmin", (PyCFunction)bw_treedict__popmin, METH_NOARGS,
